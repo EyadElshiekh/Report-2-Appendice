@@ -1,0 +1,133 @@
+// Definitions Arduino pins connected to input H Bridge
+#include <Adafruit_LiquidCrystal.h>
+#include <RotaryEncoder.h>
+ 
+int temp;
+int IN1 = A1;//LHS
+int IN2 = A2;//LHS
+int IN3 = A3;//RHS
+int IN4 = A4;//RHS
+int LS  = 13;
+int RS  = 2;
+int enA = 3;
+int enB = 11;
+int encoderPinD0 = 12;
+int encoderPinA0 = A5;
+// Create a RotaryEncoder object
+RotaryEncoder encoder(encoderPinA0, encoderPinD0);
+ 
+// Variables for rotary encoder
+int counter = 0; // Counter to keep track of encoder position
+volatile int lastEncoded = 0; // Stores the last encoded value
+ 
+ 
+// Define variables for distance calculation
+const float encoderResolution = 360.0; // Encoder resolution (pulses per revolution)
+const float wheelDiameter = 1.0; // Diameter of the wheel in arbitrary units (e.g., cm)
+const float distancePerPulse = (wheelDiameter * PI) / encoderResolution; // Calculate distance per pulse
+ 
+int seconds = 0;
+const int rs = 8, en = 9, d7 = 7, d6 = 6, d5 = 5, d4 = 4;
+Adafruit_LiquidCrystal lcd_1(rs,en,d4,d5,d6,d7);
+ 
+void setup()
+{
+// Set the output pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(LS,INPUT);
+  pinMode(RS,INPUT);
+  // Set up the rotary encoder pins
+  pinMode(encoderPinA0, INPUT);
+  pinMode(encoderPinD0, INPUT);
+  // Initialize Serial communication
+  Serial.begin(9600);
+ 
+  lcd_1.begin(16, 2);
+ 
+  lcd_1.print("ALLAH U AKBAR!!!");
+}
+ 
+void loop()
+{
+if (digitalRead(encoderPinD0)==LOW){
+    counter++;
+  }
+  else {
+    counter--;
+  }
+ 
+  if (digitalRead(encoderPinA0) == LOW){
+    counter ++;
+  }
+  else{
+    counter--;
+}
+ 
+ 
+  float distance = counter * distancePerPulse;
+ 
+ 
+  // Display distance on the lcd_1
+// Display distance on the lcd_1
+  lcd_1.setCursor(9, 0); // Set cursor to the position after "Distance: "
+  lcd_1.print("    "); // Clear the previous distance value
+  lcd_1.setCursor(9, 0); // Set cursor to the position after "Distance: "
+  lcd_1.print(distance); // Display distance value on lcd_1_1
+ 
+ 
+  // Print distance and counter values to Serial Monitor
+  Serial.print("Counter: ");
+  Serial.print(counter);
+  Serial.print(" - Distance: ");
+  Serial.print(distance);
+  Serial.println(" units");
+  // Send the value of counter
+  if( counter != temp ){
+    lcd_1.begin(16,1);
+    lcd_1.print (counter);
+    temp = counter;
+    }
+ 
+  //sensor setup
+if (digitalRead(LS)==0 && digitalRead(RS) ==0)
+  {
+    //FORWARD  
+    analogWrite(enA, 100);
+    analogWrite(enB, 100);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+  }
+else if (digitalRead(LS)==0 && digitalRead(RS)==1)
+{
+ //LEFT
+    analogWrite(enA, 255);
+    analogWrite(enB, 0);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+}
+else if (digitalRead(LS)==1 && digitalRead(RS)==0)
+{
+  //RIGHT
+    analogWrite(enA,0);
+    analogWrite(enB, 255);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+}
+else if (digitalRead(LS)==1 && digitalRead(RS)==1){
+    analogWrite(enA, 0);
+    analogWrite(enB, 0);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+}
+}

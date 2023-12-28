@@ -1,0 +1,34 @@
+// Define motor control pins
+const int motorAPin1 = 9;
+const int motorAPin2 = 10;
+const int motorBPin3 = 5;
+const int motorBPin4 = 6;
+
+void setup() {
+  // Initialize motor control pins as outputs
+  pinMode(motorAPin1, OUTPUT);
+  pinMode(motorAPin2, OUTPUT);
+  pinMode(motorBPin3, OUTPUT);
+  pinMode(motorBPin4, OUTPUT);
+
+  // Start Serial communication
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Check if data is available in the serial buffer
+  if (Serial.available() > 0) {
+    // Read a single character from the serial buffer
+    char inputvalue = Serial.read();
+
+    // Motor control based on the received character
+    if (inputvalue == 'F') {
+      // Set motors A and B to forward movement at PWM speed 80 (out of 255)
+      analogWrite(motorAPin1, 80);
+      analogWrite(motorAPin2, 0);
+      analogWrite(motorBPin3, 0);
+      analogWrite(motorBPin4, 80);
+    }
+
+  }
+}
